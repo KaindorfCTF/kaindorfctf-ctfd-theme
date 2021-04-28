@@ -340,7 +340,24 @@ function loadChals() {
         const tag = chalinfo.tags[j].value;
         const tag_class = "tag-" + tag.replace(/ /g, "-");
         chalwrap.addClass(tag_class);
-        tagdiv.append("<span class='badge badge-primary'>{0}</span>\n".format(tag));
+        
+        let badge_class;
+
+        switch(tag){
+          case "easy":
+            badge_class = "success";
+            break;
+          case "medium":
+            badge_class = "warning";
+            break;
+          case "hard":
+            badge_class = "danger";
+            break;
+          default:
+            badge_class = "secondary";
+        }
+
+        tagdiv.append("<span class='badge badge-pill badge-{0}'>{1}</span>\n".format(badge_class, tag));
       }
 
       chalbutton.append(tagdiv);
