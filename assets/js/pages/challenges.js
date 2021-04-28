@@ -271,7 +271,7 @@ function loadChals() {
     const $challenges_board = $("#challenges-board");
     challenges = response.data;
 
-    // Sort Challenges by Name
+    // Sort Challenges by Name (A-Z)
     challenges.sort(function (a, b) {
       return a.name.localeCompare(b.name);
     });
@@ -281,26 +281,30 @@ function loadChals() {
     for (let i = challenges.length - 1; i >= 0; i--) {
       challenges[i].solves = 0;
       if ($.inArray(challenges[i].category, categories) == -1) {
-        const category = challenges[i].category;
-        categories.push(category);
-
-        const categoryid = category.replace(/ /g, "-").hashCode();
-        const categoryrow = $(
-          "" +
-            '<div id="{0}-row" class="pt-5">'.format(categoryid) +
-            '<div class="category-header col-md-12 mb-3">' +
-            "</div>" +
-            '<div class="category-challenges col-md-12">' +
-            '<div class="challenges-row col-md-12"></div>' +
-            "</div>" +
-            "</div>"
-        );
-        categoryrow
-          .find(".category-header")
-          .append($("<h3>" + category + "</h3>"));
-
-        $challenges_board.append(categoryrow);
+        categories.push(challenges[i].category);
       }
+    }
+
+    // Sort Categories by Name (A-Z)
+    categories.sort();
+
+    for (let i = 0; i <= challenges.length - 1; i++) {
+      const categoryid = category.replace(/ /g, "-").hashCode();
+      const categoryrow = $(
+        "" +
+          '<div id="{0}-row" class="pt-5">'.format(categoryid) +
+          '<div class="category-header col-md-12 mb-3">' +
+          "</div>" +
+          '<div class="category-challenges col-md-12">' +
+          '<div class="challenges-row col-md-12"></div>' +
+          "</div>" +
+          "</div>"
+      );
+      categoryrow
+        .find(".category-header")
+        .append($("<h3>" + category + "</h3>"));
+  
+      $challenges_board.append(categoryrow);
     }
 
     for (let i = 0; i <= challenges.length - 1; i++) {
