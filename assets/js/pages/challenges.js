@@ -287,9 +287,11 @@ function loadChals() {
 
     // Sort Categories by Name (A-Z)
     categories.sort();
+    // Reverse bc we want the current season on top
+    categories.reverse();
 
-    for (let i = 0; i <= challenges.length - 1; i++) {
-      const categoryid = category.replace(/ /g, "-").hashCode();
+    for (let i = 0; i <= categories.length - 1; i++) {
+      const categoryid = categories[i].replace(/ /g, "-").hashCode();
       const categoryrow = $(
         "" +
           '<div id="{0}-row" class="pt-5">'.format(categoryid) +
@@ -302,7 +304,7 @@ function loadChals() {
       );
       categoryrow
         .find(".category-header")
-        .append($("<h3>" + category + "</h3>"));
+        .append($("<h3>" + categories[i] + "</h3>"));
   
       $challenges_board.append(categoryrow);
     }
