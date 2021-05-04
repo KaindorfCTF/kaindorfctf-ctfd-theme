@@ -303,6 +303,8 @@ function loadChals() {
       $challenges_board.append(categoryrow);
     }
 
+    const tag_categories = [];
+
     for (let i = 0; i <= challenges.length - 1; i++) {
       const chalinfo = challenges[i];
       const chalid = chalinfo.name.replace(/ /g, "-").hashCode();
@@ -335,6 +337,10 @@ function loadChals() {
         const tag_class = "tag-" + tag.replace(/ /g, "-");
         chalwrap.addClass(tag_class);
         
+        if ($.inArray(tag, tag_categories) == -1 && !(tag == "easy" || tag == "medium" || tag == "hard")) {
+          tag_categories.push(tag);
+        }
+
         let badge_class;
 
         switch(tag){
@@ -362,6 +368,18 @@ function loadChals() {
       $("#" + catid + "-row")
         .find(".category-challenges > .challenges-row")
         .append(chalwrap);
+    }
+
+    const filter_option = "<option value={0}>{1}</option>";
+    $("#filter-difficulty").append(filter_option.format("all", "All"));
+    $("#filter-difficulty").append(filter_option.format("easy", "Easy"));
+    $("#filter-difficulty").append(filter_option.format("medium", "Medium"));
+    $("#filter-difficulty").append(filter_option.format("hard", "Hard"));
+
+    $("#filter-category").append(filter_option.format("all", "All"));
+    tag_categories.sort();
+    for(let i = 0; i < tag_categories.length; i++){
+      $("#filter-category").append(filter_option.format(tag_categories[i], tag_categories[i]));
     }
 
     $(".challenge-button").click(function(_event) {
@@ -409,7 +427,37 @@ $(() => {
     $("#already-solved").slideUp();
     $("#too-fast").slideUp();
   });
+
+  $("#filter-difficulty").on("change", function(_event){
+    let difficulty = $(this).find(':selected').val();
+    let category = $("#filter-category").find(':selected').val();
+    const difficulty_filter = ".tag-{0}".format(difficulty);
+    const category_filter = ".tag-{0}".format(category);
+    $("*").removeClass("hide-challenge");
+    if(difficulty != "all"){
+      $('[class*=" tag-"]').not(difficulty_filter).addClass("hide-challenge");
+    }      
+    if(category != "all"){
+      $('[class*=" tag-"]').not(category_filter).addClass("hide-challenge");
+    }
+  });
+
+  $("#filter-category").on("change", function(_event){
+    let difficulty = $("#filter-difficulty").find(':selected').val();
+    let category = $(this).find(':selected').val();
+
+    const difficulty_filter = ".tag-{0}".format(difficulty);
+    const category_filter = ".tag-{0}".format(category);
+    $("*").removeClass("hide-challenge");
+    if(difficulty != "all"){
+      $('[class*=" tag-"]').not(difficulty_filter).addClass("hide-challenge");
+    }
+    if(category != "all"){
+      $('[class*=" tag-"]').not(category_filter).addClass("hide-challenge");
+    }
+  });
 });
+
 setInterval(update, 300000); // Update every 5 minutes.
 
 const displayHint = data => {
