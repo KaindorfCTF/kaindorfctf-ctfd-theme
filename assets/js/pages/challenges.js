@@ -2,15 +2,14 @@ import "./main";
 import "bootstrap/js/dist/tab";
 import { ezQuery, ezAlert } from "../ezq";
 import { htmlEntities } from "../utils";
-import Moment from "moment";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import $ from "jquery";
 import CTFd from "../CTFd";
 import config from "../config";
+import hljs from "highlight.js";
 
-const api_func = {
-  teams: x => CTFd.api.get_team_solves({ teamId: x }),
-  users: x => CTFd.api.get_user_solves({ userId: x })
-};
+dayjs.extend(relativeTime);
 
 CTFd._internal.challenge = {};
 let challenges = [];
@@ -125,6 +124,12 @@ const displayChal = chal => {
 
     challenge.postRender();
 
+    $("#challenge-window")
+      .find("pre code")
+      .each(function(_idx) {
+        hljs.highlightBlock(this);
+      });
+
     window.location.replace(
       window.location.href.split("#")[0] + `#${chal.name}-${chal.id}`
     );
@@ -168,15 +173,22 @@ function renderSubmissionResponse(response) {
     );
     result_notification.slideDown();
 
-    $(".challenge-solves").text(
-      parseInt(
-        $(".challenge-solves")
-          .text()
-          .split(" ")[0]
-      ) +
-        1 +
-        " Solves"
-    );
+    if (
+      $(".challenge-solves")
+        .text()
+        .trim()
+    ) {
+      // Only try to increment solves if the text isn't hidden
+      $(".challenge-solves").text(
+        parseInt(
+          $(".challenge-solves")
+            .text()
+            .split(" ")[0]
+        ) +
+          1 +
+          " Solves"
+      );
+    }
 
     answer_input.val("");
     answer_input.removeClass("wrong");
@@ -215,27 +227,11 @@ function renderSubmissionResponse(response) {
 }
 
 function markSolves() {
-  return api_func[CTFd.config.userMode]("me").then(function(response) {
-    const solves = response.data;
-    for (let i = solves.length - 1; i >= 0; i--) {
-      const btn = $('button[value="' + solves[i].challenge_id + '"]');
+  challenges.map(challenge => {
+    if (challenge.solved_by_me) {
+      const btn = $(`button[value="${challenge.id}"]`);
       btn.addClass("solved-challenge");
       btn.prepend("<i class='fas fa-check corner-button-check'></i>");
-    }
-  });
-}
-
-function loadUserSolves() {
-  if (CTFd.user.id == 0) {
-    return Promise.resolve();
-  }
-
-  return api_func[CTFd.config.userMode]("me").then(function(response) {
-    const solves = response.data;
-
-    for (let i = solves.length - 1; i >= 0; i--) {
-      const chal_id = solves[i].challenge_id;
-      solves.push(chal_id);
     }
   });
 }
@@ -249,9 +245,7 @@ function getSolves(id) {
     for (let i = 0; i < data.length; i++) {
       const id = data[i].account_id;
       const name = data[i].name;
-      const date = Moment(data[i].date)
-        .local()
-        .fromNow();
+      const date = dayjs(data[i].date).fromNow();
       const account_url = data[i].account_url;
       box.append(
         '<tr><td><a href="{0}">{2}</td><td>{3}</td></tr>'.format(
@@ -372,15 +366,12 @@ function loadChals() {
 
     $(".challenge-button").click(function(_event) {
       loadChal(this.value);
-      getSolves(this.value);
     });
   });
 }
 
 function update() {
-  return loadUserSolves() // Load the user's solved challenge ids
-    .then(loadChals) //  Load the full list of challenges
-    .then(markSolves);
+  return loadChals().then(markSolves);
 }
 
 $(() => {
