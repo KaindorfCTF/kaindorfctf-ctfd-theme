@@ -284,6 +284,8 @@ function loadChals() {
     // Reverse bc we want the current season on top
     categories.reverse();
 
+    categories = ['warmup', 'easy', 'medium', 'hard'];
+
     for (let i = 0; i <= categories.length - 1; i++) {
       const categoryid = categories[i].replace(/ /g, "-").hashCode();
       const categoryrow = $(
