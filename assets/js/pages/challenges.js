@@ -261,7 +261,7 @@ function getSolves(id) {
 
 function loadChals() {
   return CTFd.api.get_challenge_list().then(function(response) {
-    const categories = [];
+    let categories = [];
     const $challenges_board = $("#challenges-board");
     challenges = response.data;
 
@@ -281,6 +281,10 @@ function loadChals() {
 
     // Sort Categories by Name (A-Z)
     categories.sort();
+    // Reverse bc we want the current season on top
+    categories.reverse();
+
+    categories = ['warmup', 'easy', 'medium', 'hard'];
 
     for (let i = 0; i <= categories.length - 1; i++) {
       const categoryid = categories[i].replace(/ /g, "-").hashCode();
