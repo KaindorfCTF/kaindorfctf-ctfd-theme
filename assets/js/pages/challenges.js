@@ -332,7 +332,7 @@ function loadChals() {
 
       const chalheader = $("<p>{0}</p>".format(chalinfo.name));
       const chalscore = $("<span>{0}</span>".format(chalinfo.value));
-      let tagdiv = $("<div></div>");
+      let tagdiv = $('<div style="margin-bottom:8px;"></div>');
 
       for (let j = 0; j < chalinfo.tags.length; j++) {
         const tag = chalinfo.tags[j].value;
@@ -362,8 +362,8 @@ function loadChals() {
         tagdiv.append("<span class='badge badge-pill badge-{0}'>{1}</span>\n".format(badge_class, tag));
       }
 
-      chalbutton.append(tagdiv);
       chalbutton.append(chalheader);
+      chalbutton.append(tagdiv);
       chalbutton.append(chalscore);
       chalwrap.append(chalbutton);
 
