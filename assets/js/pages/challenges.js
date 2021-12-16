@@ -264,7 +264,11 @@ function loadChals() {
     const categories = [];
     const $challenges_board = $("#challenges-board");
     challenges = response.data;
-
+    
+    if (window.BETA_sortChallenges) {
+      challenges = window.BETA_sortChallenges(challenges);
+    }
+    
     // Sort Challenges by Name (A-Z)
     challenges.sort(function (a, b) {
       return a.name.localeCompare(b.name);
@@ -506,3 +510,5 @@ const loadHint = id => {
     displayUnlock(id);
   });
 };
+
+window.updateChallengeBoard = update;
